@@ -1,11 +1,4 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -17,8 +10,11 @@ import {
 } from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {createStackNavigator} from '@react-navigation/stack';
 import {Calendar} from 'react-native-calendars';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import LoginScreen from './LoginScreen';
 
 type NewsItemProps = {
   title: string;
@@ -115,14 +111,37 @@ function CalendarScreen(): React.JSX.Element {
 }
 
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
+
+function MainApp() {
+  return (
+    <Tab.Navigator>
+      <Tab.Screen name="News" component={NewsScreen} />
+      <Tab.Screen name="Calendar" component={CalendarScreen} />
+    </Tab.Navigator>
+  );
+}
 
 function App(): React.JSX.Element {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      const token = await AsyncStorage.getItem('token');
+      setIsLoggedIn(!!token);
+    };
+    checkLoginStatus();
+  }, []);
+
   return (
     <NavigationContainer>
-      <Tab.Navigator>
-        <Tab.Screen name="News" component={NewsScreen} />
-        <Tab.Screen name="Calendar" component={CalendarScreen} />
-      </Tab.Navigator>
+      <Stack.Navigator>
+        {isLoggedIn ? (
+          <Stack.Screen name="MainApp" component={MainApp} />
+        ) : (
+          <Stack.Screen name="Login" component={LoginScreen} />
+        )}
+      </Stack.Navigator>
     </NavigationContainer>
   );
 }
@@ -145,21 +164,16 @@ const styles = StyleSheet.create({
   },
   newsDate: {
     fontSize: 14,
-    fontWeight: '400',
     marginTop: 4,
   },
   newsDescription: {
-    fontSize: 16,
-    fontWeight: '400',
-    marginTop: 8,
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    fontSize: 14,
+    marginTop: 4,
   },
   fullScreenContainer: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
