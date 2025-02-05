@@ -21,7 +21,6 @@ const LoginScreen = ({navigation}: any): React.JSX.Element => {
       const {token} = response.data;
       await AsyncStorage.setItem('token', token);
       Alert.alert('Login Successful', `Token: ${token}`);
-      navigation.navigate('MainApp');
     } catch (error) {
       const errorMessage =
         axios.isAxiosError(error) && error.response?.data
