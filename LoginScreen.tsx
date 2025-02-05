@@ -2,53 +2,21 @@ import React, {useState} from 'react';
 import {View, Text, TextInput, Button, StyleSheet, Alert} from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {login, register} from './auth';
 
-const LoginScreen = ({navigation}: any): React.JSX.Element => {
+const LoginScreen = ({navigation, setIsLoggedIn}: any): React.JSX.Element => {
   const [isRegistering, setIsRegistering] = useState(false);
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = async () => {
-    try {
-      const response = await axios.post(
-        'http://localhost:3000/api/users/login',
-        {
-          username,
-          password,
-        },
-      );
-      const {token} = response.data;
-      await AsyncStorage.setItem('token', token);
-      Alert.alert('Login Successful', `Token: ${token}`);
-    } catch (error) {
-      const errorMessage =
-        axios.isAxiosError(error) && error.response?.data
-          ? error.response.data
-          : 'An error occurred';
-      Alert.alert('Login Failed', errorMessage);
-    }
+    await login(username, password, setIsLoggedIn);
   };
 
   const handleRegister = async () => {
-    try {
-      const response = await axios.post(
-        'http://localhost:3000/api/users/register',
-        {
-          username,
-          email,
-          password,
-        },
-      );
-      Alert.alert('Registration Successful', 'You can now log in');
-      setIsRegistering(false);
-    } catch (error) {
-      const errorMessage =
-        axios.isAxiosError(error) && error.response?.data
-          ? error.response.data
-          : 'An error occurred';
-      Alert.alert('Registration Failed', errorMessage);
-    }
+    await register(username, email, password);
+    setIsRegistering(false);
   };
 
   return (

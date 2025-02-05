@@ -13,8 +13,10 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
 import {Calendar} from 'react-native-calendars';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoginScreen from './LoginScreen';
+import AccountScreen from './AccountScreen';
+import {checkLoginStatus} from './auth';
+import NoteEditorScreen from './NoteEditorScreen';
 
 type NewsItemProps = {
   title: string;
@@ -102,10 +104,14 @@ function NewsScreen(): React.JSX.Element {
   );
 }
 
-function CalendarScreen(): React.JSX.Element {
+function CalendarScreen({navigation}: any): React.JSX.Element {
+  const handleDayPress = (day: any) => {
+    navigation.navigate('NoteEditor', {selectedDate: day.dateString});
+  };
+
   return (
     <View style={styles.fullScreenContainer}>
-      <Calendar />
+      <Calendar onDayPress={handleDayPress} />
     </View>
   );
 }
@@ -113,11 +119,14 @@ function CalendarScreen(): React.JSX.Element {
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-function MainApp() {
+function MainApp({setIsLoggedIn}: any) {
   return (
     <Tab.Navigator>
       <Tab.Screen name="News" component={NewsScreen} />
       <Tab.Screen name="Calendar" component={CalendarScreen} />
+      <Tab.Screen name="Account">
+        {props => <AccountScreen {...props} setIsLoggedIn={setIsLoggedIn} />}
+      </Tab.Screen>
     </Tab.Navigator>
   );
 }
@@ -126,20 +135,42 @@ function App(): React.JSX.Element {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const checkLoginStatus = async () => {
-      const token = await AsyncStorage.getItem('token');
-      setIsLoggedIn(!!token);
-    };
-    checkLoginStatus();
+    checkLoginStatus(setIsLoggedIn);
   }, []);
 
   return (
     <NavigationContainer>
       <Stack.Navigator>
         {isLoggedIn ? (
-          <Stack.Screen name="MainApp" component={MainApp} />
+          <>
+            <Stack.Screen
+              name="MainApp"
+              options={{
+                headerShown: false,
+              }}>
+              {(props: any) => (
+                <MainApp {...props} setIsLoggedIn={setIsLoggedIn} />
+              )}
+            </Stack.Screen>
+            <Stack.Screen
+              name="NoteEditor"
+              component={NoteEditorScreen}
+              options={{
+                title: 'Edit Note',
+                headerBackTitle: 'Back',
+              }}
+            />
+          </>
         ) : (
-          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen
+            name="Login"
+            options={{
+              headerShown: false,
+            }}>
+            {(props: any) => (
+              <LoginScreen {...props} setIsLoggedIn={setIsLoggedIn} />
+            )}
+          </Stack.Screen>
         )}
       </Stack.Navigator>
     </NavigationContainer>
@@ -172,8 +203,6 @@ const styles = StyleSheet.create({
   },
   fullScreenContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });
 
