@@ -1,6 +1,11 @@
+import {jwtDecode} from 'jwt-decode';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Alert} from 'react-native';
+
+interface DecodedToken {
+  exp: number;
+}
 
 export const login = async (
   username: string,
@@ -52,6 +57,16 @@ export const checkLoginStatus = async (
   setIsLoggedIn: (value: boolean) => void,
 ) => {
   const token = await AsyncStorage.getItem('token');
+  if (token) {
+    const decoded: DecodedToken = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+    if (decoded.exp < currentTime) {
+      await AsyncStorage.removeItem('token');
+      setIsLoggedIn(false);
+    } else {
+      setIsLoggedIn(true);
+    }
+  }
   setIsLoggedIn(!!token);
 };
 

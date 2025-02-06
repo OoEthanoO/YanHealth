@@ -13,6 +13,7 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
 import {Calendar} from 'react-native-calendars';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
+import Icon from 'react-native-vector-icons/Ionicons';
 import LoginScreen from './LoginScreen';
 import AccountScreen from './AccountScreen';
 import {checkLoginStatus} from './auth';
@@ -121,7 +122,22 @@ const Stack = createStackNavigator();
 
 function MainApp({setIsLoggedIn}: any) {
   return (
-    <Tab.Navigator>
+    <Tab.Navigator
+      screenOptions={({route}) => ({
+        tabBarIcon: ({color, size}) => {
+          let iconName = '';
+
+          if (route.name === 'News') {
+            iconName = 'newspaper-outline';
+          } else if (route.name === 'Calendar') {
+            iconName = 'calendar-outline';
+          } else if (route.name === 'Account') {
+            iconName = 'person-outline';
+          }
+
+          return <Icon name={iconName} size={size} color={color} />;
+        },
+      })}>
       <Tab.Screen name="News" component={NewsScreen} />
       <Tab.Screen name="Calendar" component={CalendarScreen} />
       <Tab.Screen name="Account">
