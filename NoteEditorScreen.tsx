@@ -37,7 +37,7 @@ const NoteEditorScreen = ({route, navigation}: any): React.JSX.Element => {
     fetchNote();
   }, [selectedDate]);
 
-  const handleSave = async () => {
+  const handleSave = async (): Promise<void> => {
     if (isPastDate) {
       Alert.alert('Error', 'You cannot edit notes in the past.');
       return;
@@ -91,6 +91,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 8,
     marginBottom: 16,
+    textAlignVertical: 'top',
+    textAlign: 'left',
   },
   textView: {
     flex: 1,
