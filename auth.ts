@@ -2,10 +2,15 @@ import {jwtDecode} from 'jwt-decode';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Alert} from 'react-native';
+import {DEBUG} from './config';
 
 interface DecodedToken {
   exp: number;
 }
+
+const BASE_URL = DEBUG
+  ? 'http://localhost:3000'
+  : 'https://yanhealth.onrender.com';
 
 export const login = async (
   username: string,
@@ -13,7 +18,7 @@ export const login = async (
   setIsLoggedIn: (value: boolean) => void,
 ) => {
   try {
-    const response = await axios.post('http://localhost:3000/api/users/login', {
+    const response = await axios.post(`${BASE_URL}/api/users/login`, {
       username,
       password,
     });
@@ -35,14 +40,11 @@ export const register = async (
   password: string,
 ) => {
   try {
-    const response = await axios.post(
-      'http://localhost:3000/api/users/register',
-      {
-        username,
-        email,
-        password,
-      },
-    );
+    const response = await axios.post(`${BASE_URL}/api/users/register`, {
+      username,
+      email,
+      password,
+    });
     Alert.alert('Registration Successful', 'You can now log in');
   } catch (error) {
     const errorMessage =

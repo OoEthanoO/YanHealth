@@ -3,6 +3,11 @@ import {View, Text, TextInput, Button, StyleSheet, Alert} from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
+import {DEBUG} from './config';
+
+const BASE_URL = DEBUG
+  ? 'http://localhost:3000'
+  : 'https://yanhealth.onrender.com';
 
 const NoteEditorScreen = ({route, navigation}: any): React.JSX.Element => {
   const {selectedDate} = route.params;
@@ -14,7 +19,7 @@ const NoteEditorScreen = ({route, navigation}: any): React.JSX.Element => {
       const token = await AsyncStorage.getItem('token');
       try {
         const response = await axios.get(
-          `http://localhost:3000/api/notes/${selectedDate}`,
+          `${BASE_URL}/api/notes/${selectedDate}`,
           {
             headers: {Authorization: `Bearer ${token}`},
           },
@@ -41,7 +46,7 @@ const NoteEditorScreen = ({route, navigation}: any): React.JSX.Element => {
     const token = await AsyncStorage.getItem('token');
     try {
       await axios.post(
-        'http://localhost:3000/api/notes',
+        `${BASE_URL}/api/notes`,
         {date: selectedDate, note},
         {headers: {Authorization: `Bearer ${token}`}},
       );
