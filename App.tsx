@@ -13,11 +13,11 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
 import {Calendar} from 'react-native-calendars';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-import Icon from 'react-native-vector-icons/Ionicons';
 import LoginScreen from './LoginScreen';
 import AccountScreen from './AccountScreen';
 import {checkLoginStatus} from './auth';
 import NoteEditorScreen from './NoteEditorScreen';
+import {SFSymbol} from 'react-native-sfsymbols';
 
 type NewsItemProps = {
   title: string;
@@ -128,14 +128,14 @@ function MainApp({setIsLoggedIn}: any) {
           let iconName = '';
 
           if (route.name === 'News') {
-            iconName = 'newspaper-outline';
+            iconName = 'newspaper';
           } else if (route.name === 'Calendar') {
-            iconName = 'calendar-outline';
+            iconName = 'calendar';
           } else if (route.name === 'Account') {
-            iconName = 'person-outline';
+            iconName = 'person';
           }
 
-          return <Icon name={iconName} size={size} color={color} />;
+          return <SFSymbol name={iconName} size={size} color={color} />;
         },
       })}>
       <Tab.Screen name="News" component={NewsScreen} />
