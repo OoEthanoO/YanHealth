@@ -17,7 +17,6 @@ import LoginScreen from './LoginScreen';
 import AccountScreen from './AccountScreen';
 import {checkLoginStatus} from './auth';
 import NoteEditorScreen from './NoteEditorScreen';
-import {SFSymbol} from 'react-native-sfsymbols';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 type NewsItemProps = {
