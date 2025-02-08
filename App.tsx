@@ -18,6 +18,7 @@ import AccountScreen from './AccountScreen';
 import {checkLoginStatus} from './auth';
 import NoteEditorScreen from './NoteEditorScreen';
 import {SFSymbol} from 'react-native-sfsymbols';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 type NewsItemProps = {
   title: string;
@@ -128,14 +129,14 @@ function MainApp({setIsLoggedIn}: any) {
           let iconName = '';
 
           if (route.name === 'News') {
-            iconName = 'newspaper';
+            iconName = 'newspaper-outline';
           } else if (route.name === 'Calendar') {
-            iconName = 'calendar';
+            iconName = 'calendar-outline';
           } else if (route.name === 'Account') {
-            iconName = 'person';
+            iconName = 'person-outline';
           }
 
-          return <SFSymbol name={iconName} size={size} color={color} />;
+          return <Icon name={iconName} size={size} color={color} />;
         },
       })}>
       <Tab.Screen name="News" component={NewsScreen} />
