@@ -16,7 +16,7 @@ router.post('/', authMiddleware, async (req, res) => {
   try {
     const existingNote = await Note.findOne({userId, date});
     if (existingNote) {
-      existinNote.note = note;
+      existingNote.note = note;
       await existingNote.save();
     } else {
       const newNote = new Note({userId, date, note});

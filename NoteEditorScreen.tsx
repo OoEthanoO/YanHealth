@@ -52,8 +52,12 @@ const NoteEditorScreen = ({route, navigation}: any): React.JSX.Element => {
       );
       Alert.alert('Note saved', 'Your note has been saved successfully.');
     } catch (error) {
-      console.error('Error saving note:', error);
-      Alert.alert('Erorr', 'There was an error saving your note.');
+      if (axios.isAxiosError(error)) {
+        console.error('Error saving note:', error.response?.data);
+      } else {
+        console.error('Error saving note:', error);
+      }
+      Alert.alert('Error', 'There was an error saving your note.');
     }
   };
 
