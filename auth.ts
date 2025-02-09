@@ -18,6 +18,7 @@ export const login = async (
   setIsLoggedIn: (value: boolean) => void,
 ) => {
   try {
+    console.log('Attempting to log in with username:', username);
     const response = await axios.post(`${BASE_URL}/api/users/login`, {
       username,
       password,
@@ -25,11 +26,13 @@ export const login = async (
     const {token} = response.data;
     await AsyncStorage.setItem('token', token);
     setIsLoggedIn(true);
+    console.log('Login successful');
   } catch (error) {
     const errorMessage =
       axios.isAxiosError(error) && error.response?.data
         ? error.response.data
         : 'An error occurred';
+    console.error('Login failed:', errorMessage);
     Alert.alert('Login Failed', errorMessage);
   }
 };

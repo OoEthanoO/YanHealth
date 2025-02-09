@@ -29,7 +29,7 @@ const newsData: NewsItemProps[] = [
   {
     title: 'News Title 1',
     date: '2023-10-01',
-    description: 'This is a short description of news item 1.',
+    description: 'This is a nigga description of news item 1.',
   },
   {
     title: 'News Title 2',
