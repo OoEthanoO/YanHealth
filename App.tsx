@@ -18,6 +18,7 @@ import AccountScreen from './AccountScreen';
 import {checkLoginStatus} from './auth';
 import NoteEditorScreen from './NoteEditorScreen';
 import Icon from 'react-native-vector-icons/Ionicons';
+import AppleWatchScreen from './AppleWatchScreen';
 
 type NewsItemProps = {
   title: string;
@@ -143,6 +144,7 @@ function MainApp({setIsLoggedIn}: any) {
       <Tab.Screen name="Account">
         {props => <AccountScreen {...props} setIsLoggedIn={setIsLoggedIn} />}
       </Tab.Screen>
+      <Tab.Screen name="AppleWatch" component={AppleWatchScreen} />
     </Tab.Navigator>
   );
 }

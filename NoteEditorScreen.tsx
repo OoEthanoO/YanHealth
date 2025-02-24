@@ -3,6 +3,7 @@ import {View, Text, TextInput, Button, StyleSheet, Alert} from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
+import AppleHealthKit from 'react-native-health';
 import {DEBUG} from './config';
 
 const BASE_URL = DEBUG
@@ -12,6 +13,10 @@ const BASE_URL = DEBUG
 const NoteEditorScreen = ({route, navigation}: any): React.JSX.Element => {
   const {selectedDate} = route.params;
   const [note, setNote] = useState('');
+  const [healthData, setHealthData] = useState<{
+    heartRate?: number | string;
+    steps?: number | string;
+  }>({});
   const isPastDate = moment(selectedDate).isBefore(moment(), 'day');
 
   useEffect(() => {
@@ -34,7 +39,33 @@ const NoteEditorScreen = ({route, navigation}: any): React.JSX.Element => {
       }
     };
 
+    const fetchHealthData = async () => {
+      const options = {
+        startDate: moment(selectedDate).startOf('day').toISOString(),
+        endDate: moment(selectedDate).endOf('day').toISOString(),
+      };
+
+      AppleHealthKit.getHeartRateSamples(options, (err, results) => {
+        if (err) {
+          console.error('Error fetching heart rate:', err);
+          return;
+        }
+        const heartRate = results.length ? results[0].value : 'N/A';
+        setHealthData(prevData => ({...prevData, heartRate}));
+      });
+
+      AppleHealthKit.getStepCount(options, (err, results) => {
+        if (err) {
+          console.error('Error fetching step:', err);
+          return;
+        }
+        const steps = results ? results.value : 'N/A';
+        setHealthData(prevData => ({...prevData, steps}));
+      });
+    };
+
     fetchNote();
+    fetchHealthData();
   }, [selectedDate]);
 
   const handleSave = async (): Promise<void> => {
@@ -47,7 +78,7 @@ const NoteEditorScreen = ({route, navigation}: any): React.JSX.Element => {
     try {
       await axios.post(
         `${BASE_URL}/api/notes`,
-        {date: selectedDate, note},
+        {date: selectedDate, note, healthData},
         {headers: {Authorization: `Bearer ${token}`}},
       );
       Alert.alert('Note saved', 'Your note has been saved successfully.');
@@ -74,6 +105,12 @@ const NoteEditorScreen = ({route, navigation}: any): React.JSX.Element => {
           onChangeText={setNote}
           placeholder="Enter your note here..."
         />
+      )}
+      {healthData && (
+        <View style={styles.healthDataContainer}>
+          <Text>Average Heart Rate: {healthData.heartRate}</Text>
+          <Text>Steps Taken: {healthData.steps}</Text>
+        </View>
       )}
       {!isPastDate && <Button title="Save" onPress={handleSave} />}
     </View>
@@ -105,6 +142,9 @@ const styles = StyleSheet.create({
     padding: 8,
     marginBottom: 16,
     backgroundColor: '#f9f9f9',
+  },
+  healthDataContainer: {
+    marginTop: 16,
   },
 });
 
