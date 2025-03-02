@@ -7,6 +7,7 @@ import {
   Text,
   useColorScheme,
   View,
+  Platform,
 } from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
@@ -30,7 +31,7 @@ const newsData: NewsItemProps[] = [
   {
     title: 'News Title 1',
     date: '2023-10-01',
-    description: 'This is a nigga description of news item 1.',
+    description: 'This is a short description of news item 1.',
   },
   {
     title: 'News Title 2',
@@ -144,7 +145,9 @@ function MainApp({setIsLoggedIn}: any) {
       <Tab.Screen name="Account">
         {props => <AccountScreen {...props} setIsLoggedIn={setIsLoggedIn} />}
       </Tab.Screen>
-      <Tab.Screen name="AppleWatch" component={AppleWatchScreen} />
+      {Platform.OS !== 'android' && (
+        <Tab.Screen name="AppleWatch" component={AppleWatchScreen} />
+      )}
     </Tab.Navigator>
   );
 }
