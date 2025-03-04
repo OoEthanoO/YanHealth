@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -16,10 +16,13 @@ import {Calendar} from 'react-native-calendars';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import LoginScreen from './LoginScreen';
 import AccountScreen from './AccountScreen';
-import {checkLoginStatus} from './auth';
+import {checkLoginStatus, logout} from './auth';
 import NoteEditorScreen from './NoteEditorScreen';
 import Icon from 'react-native-vector-icons/Ionicons';
 import AppleWatchScreen from './AppleWatchScreen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {jwtDecode} from 'jwt-decode';
+import setupAxiosInterceptor from './axiosIntercepter';
 
 type NewsItemProps = {
   title: string;
@@ -154,13 +157,33 @@ function MainApp({setIsLoggedIn}: any) {
 
 function App(): React.JSX.Element {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigationRef = useRef(null);
 
   useEffect(() => {
+    const checkTokenExpiration = async () => {
+      const token = await AsyncStorage.getItem('token');
+      if (token) {
+        const decoded: {exp: number} = jwtDecode(token);
+        const currentTime = Date.now() / 1000;
+        if (decoded.exp < currentTime) {
+          await logout();
+          setIsLoggedIn(false);
+        }
+      }
+    };
+
     checkLoginStatus(setIsLoggedIn);
+    const interval = setInterval(checkTokenExpiration, 60000);
+
+    return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    setupAxiosInterceptor(setIsLoggedIn, navigationRef.current);
+  }, [isLoggedIn]);
+
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <Stack.Navigator>
         {isLoggedIn ? (
           <>
