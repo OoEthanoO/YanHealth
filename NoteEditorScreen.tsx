@@ -13,11 +13,13 @@ const BASE_URL = DEBUG
 const NoteEditorScreen = ({route, navigation}: any): React.JSX.Element => {
   const {selectedDate} = route.params;
   const [note, setNote] = useState('');
+  const [redMeat, setRedMeat] = useState(0);
   const [healthData, setHealthData] = useState<{
     heartRate?: number | string;
     steps?: number | string;
   }>({});
   const isPastDate = moment(selectedDate).isBefore(moment(), 'day');
+  const isFutureDate = moment(selectedDate).isAfter(moment(), 'day');
 
   useEffect(() => {
     const fetchNote = async () => {
@@ -74,6 +76,11 @@ const NoteEditorScreen = ({route, navigation}: any): React.JSX.Element => {
       return;
     }
 
+    if (isFutureDate) {
+      Alert.alert('Error', 'You cannot edit notes in the future.');
+      return;
+    }
+
     const token = await AsyncStorage.getItem('token');
     try {
       await axios.post(
@@ -95,16 +102,33 @@ const NoteEditorScreen = ({route, navigation}: any): React.JSX.Element => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Notes for {selectedDate}</Text>
-      {isPastDate ? (
+      {isPastDate || isFutureDate ? (
         <Text style={styles.textView}>{note}</Text>
       ) : (
-        <TextInput
-          style={styles.textInput}
-          multiline
-          value={note}
-          onChangeText={setNote}
-          placeholder="Enter your note here..."
-        />
+        <>
+          <TextInput
+            style={styles.textInput}
+            multiline
+            value={note}
+            onChangeText={setNote}
+            placeholder="Enter your note here..."
+          />
+          <view style={styles.redMeatContainer}>
+            <TextInput
+              style={styles.textInput}
+              keyboardType="numeric"
+              value={redMeat.toString()}
+              placeholder="Enter red meat eaten (g)..."
+              onChangeText={text => {
+                if (text === '') {
+                  setRedMeat(0);
+                  return;
+                }
+                setRedMeat(parseInt(text));
+              }}
+            />
+          </view>
+        </>
       )}
       {healthData && (
         <View style={styles.healthDataContainer}>
@@ -112,7 +136,9 @@ const NoteEditorScreen = ({route, navigation}: any): React.JSX.Element => {
           <Text>Steps Taken: {healthData.steps}</Text>
         </View>
       )}
-      {!isPastDate && <Button title="Save" onPress={handleSave} />}
+      {!(isPastDate || isFutureDate) && (
+        <Button title="Save" onPress={handleSave} />
+      )}
     </View>
   );
 };
@@ -142,6 +168,11 @@ const styles = StyleSheet.create({
     padding: 8,
     marginBottom: 16,
     backgroundColor: '#f9f9f9',
+  },
+  redMeatContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
   },
   healthDataContainer: {
     marginTop: 16,

@@ -13,6 +13,10 @@ router.post('/', authMiddleware, async (req, res) => {
     return res.status(400).send('Cannot save notes for past dates.');
   }
 
+  if (moment(date).isAfter(moment(), 'day')) {
+    return res.status(400).send('Cannot save notes for future dates.');
+  }
+
   try {
     const existingNote = await Note.findOne({userId, date});
     if (existingNote) {

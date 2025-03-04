@@ -8,6 +8,7 @@ import {
   useColorScheme,
   View,
   Platform,
+  Alert,
 } from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
@@ -109,7 +110,14 @@ function NewsScreen(): React.JSX.Element {
 
 function CalendarScreen({navigation}: any): React.JSX.Element {
   const handleDayPress = (day: any) => {
-    navigation.navigate('NoteEditor', {selectedDate: day.dateString});
+    const selectedDate = day.dateString;
+    const isFutureDate = new Date(selectedDate) > new Date();
+    console.log('Selected date:', selectedDate);
+    if (isFutureDate) {
+      Alert.alert('You cannot edit notes in the future.');
+    } else {
+      navigation.navigate('NoteEditor', {selectedDate});
+    }
   };
 
   return (
@@ -135,6 +143,8 @@ function MainApp({setIsLoggedIn}: any) {
             iconName = 'calendar-outline';
           } else if (route.name === 'Account') {
             iconName = 'person-outline';
+          } else if (route.name === 'Apple Watch') {
+            iconName = 'watch-outline';
           }
 
           return <Icon name={iconName} size={size} color={color} />;
@@ -146,7 +156,7 @@ function MainApp({setIsLoggedIn}: any) {
         {props => <AccountScreen {...props} setIsLoggedIn={setIsLoggedIn} />}
       </Tab.Screen>
       {Platform.OS !== 'android' && (
-        <Tab.Screen name="AppleWatch" component={AppleWatchScreen} />
+        <Tab.Screen name="Apple Watch" component={AppleWatchScreen} />
       )}
     </Tab.Navigator>
   );
